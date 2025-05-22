@@ -1,0 +1,175 @@
+<!-- Simple Shop Web Page for Automation Testing Candidates
+     Author: ATCOM / Kosta
+     Purpose: Provide a minimal UI so candidates can write UI‑automation or API/playwright tests.
+     Features: Add‑to‑cart, cart summary, clear cart. All elements are tagged with
+     data-testid attributes for reliable selectors.
+-->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Simple Shop</title>
+    <style>
+      body {
+        font-family: system-ui, sans-serif;
+        margin: 2rem auto;
+        max-width: 720px;
+        padding: 0 1rem;
+      }
+
+      h1 {
+        text-align: center;
+        margin-bottom: 1.5rem;
+      }
+
+      .product {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0.75rem 1rem;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        margin-bottom: 1rem;
+      }
+
+      .product-name {
+        font-weight: 600;
+      }
+
+      .product-price {
+        margin-left: 0.5rem;
+        color: #555;
+      }
+
+      button {
+        padding: 0.4rem 0.9rem;
+        font-size: 0.9rem;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        background: #0a84ff;
+        color: #fff;
+      }
+
+      button:hover {
+        filter: brightness(1.1);
+      }
+
+      #cart {
+        margin-top: 2rem;
+        border-top: 2px solid #eee;
+        padding-top: 1.5rem;
+      }
+
+      #cart-items li {
+        margin: 0.25rem 0;
+      }
+
+      #clear-cart {
+        margin-top: 0.75rem;
+        background: #e53935;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Simple Shop</h1>
+
+    <!-- Product List -->
+    <section id="products" data-testid="product-list">
+      <div class="product" data-testid="product-1">
+        <span class="product-name" data-testid="product-name-1">Wireless Mouse</span>
+        <span class="product-price" data-testid="product-price-1">€25.00</span>
+        <button class="add-to-cart" data-product-id="1" data-testid="add-to-cart-1">
+          Add to Cart
+        </button>
+      </div>
+
+      <div class="product" data-testid="product-2">
+        <span class="product-name" data-testid="product-name-2">Mechanical Keyboard</span>
+        <span class="product-price" data-testid="product-price-2">€90.00</span>
+        <button class="add-to-cart" data-product-id="2" data-testid="add-to-cart-2">
+          Add to Cart
+        </button>
+      </div>
+
+      <div class="product" data-testid="product-3">
+        <span class="product-name" data-testid="product-name-3">HD Monitor</span>
+        <span class="product-price" data-testid="product-price-3">€180.00</span>
+        <button class="add-to-cart" data-product-id="3" data-testid="add-to-cart-3">
+          Add to Cart
+        </button>
+      </div>
+    </section>
+
+    <!-- Cart Section -->
+    <section id="cart">
+      <h2>
+        Cart (<span id="cart-count" data-testid="cart-count">0</span>)
+      </h2>
+      <ul id="cart-items" data-testid="cart-items"></ul>
+      <p>
+        Total: €<span id="cart-total" data-testid="cart-total">0.00</span>
+      </p>
+      <button id="clear-cart" data-testid="clear-cart">Clear Cart</button>
+    </section>
+
+    <script>
+      // Product catalogue (id -> details)
+      const products = {
+        1: { name: "Wireless Mouse", price: 25.0 },
+        2: { name: "Mechanical Keyboard", price: 90.0 },
+        3: { name: "HD Monitor", price: 180.0 },
+      };
+
+      // Cart state
+      const cart = [];
+
+      // DOM refs
+      const cartCountEl = document.getElementById("cart-count");
+      const cartItemsEl = document.getElementById("cart-items");
+      const cartTotalEl = document.getElementById("cart-total");
+      const clearCartBtn = document.getElementById("clear-cart");
+
+      // Utility: format price
+      const formatPrice = (num) => num.toFixed(2);
+
+      // Render cart to DOM
+      function renderCart() {
+        cartCountEl.textContent = cart.length;
+
+        // Clear existing list
+        cartItemsEl.innerHTML = "";
+
+        let total = 0;
+        cart.forEach((id) => {
+          const li = document.createElement("li");
+          li.textContent = `${products[id].name} — €${formatPrice(products[id].price)}`;
+          cartItemsEl.appendChild(li);
+          total += products[id].price;
+        });
+        cartTotalEl.textContent = formatPrice(total);
+      }
+
+      // Add‑to‑cart handler
+      function handleAddToCart(e) {
+        const id = e.target.getAttribute("data-product-id");
+        cart.push(id);
+        renderCart();
+      }
+
+      // Wire up buttons lazily (works even if products are dynamic later)
+      document.addEventListener("click", (e) => {
+        if (e.target.matches(".add-to-cart")) {
+          handleAddToCart(e);
+        }
+      });
+
+      // Clear cart
+      clearCartBtn.addEventListener("click", () => {
+        cart.length = 0;
+        renderCart();
+      });
+    </script>
+  </body>
+</html>
